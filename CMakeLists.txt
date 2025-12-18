@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.26)
-project(hello C CXX)
+project(SwitchController C CXX)
 
 find_package(SDL3 REQUIRED)
 
-add_executable(gamepad-polling)
+add_executable(main)
 
-target_sources(gamepad-polling
+target_sources(main
 PRIVATE
-    gamepad-polling.c
+    main.c
+    joycon.c
 )
 
-target_link_libraries(gamepad-polling SDL3::SDL3)
+target_link_libraries(main SDL3::SDL3)
