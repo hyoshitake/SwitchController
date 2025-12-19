@@ -70,9 +70,9 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-            // 3. Gyroセンサーが有効な場合、データを表示
+            // 3. Gyroセンサーが有効な場合、大きな動きを検出
             if (gyro_enabled) {
-                joycon_read_and_display_gyro(gamepad);
+                joycon_detect_big_motion(gamepad);
             }
 
             // CPU負荷を下げるため少し待機（約60Hz）
