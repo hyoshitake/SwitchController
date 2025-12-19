@@ -104,6 +104,14 @@ bool joycon_detect_big_motion(SDL_Gamepad* gamepad) {
         return false;
     }
 
+    time_t current_time = time(NULL);
+
+    // メッセージ表示期間中は変化量の測定も停止
+    if (current_time < message_display_until) {
+        // 待機中は何もしない
+        return true;
+    }
+
     float gyro_data[3];
 
     // Gyroセンサーのデータを取得
@@ -135,8 +143,6 @@ bool joycon_detect_big_motion(SDL_Gamepad* gamepad) {
     // 閾値は実験的に調整が必要（ここでは15.0 rad/s）
     const float THRESHOLD = 15.0f;
 
-    time_t current_time = time(NULL);
-
     if (magnitude > THRESHOLD) {
         printf("\n====================================\n");
         printf("   手裏剣ファイヤー！！！！！！\n");
@@ -144,11 +150,6 @@ bool joycon_detect_big_motion(SDL_Gamepad* gamepad) {
 
         // 2秒間表示を維持する時刻を記録
         message_display_until = current_time + 2;
-    }
-
-    // メッセージ表示期間中は通常のGyroデータ表示をスキップ
-    if (current_time < message_display_until) {
-        // メッセージ表示中
         return true;
     }
 
