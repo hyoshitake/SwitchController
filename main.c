@@ -3,11 +3,20 @@
 #include <stdbool.h>
 #include "joycon.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /**
  * メイン関数
  * Joy-Conの接続を管理し、Gyroセンサーのデータを表示する
  */
 int main(int argc, char* argv[]) {
+#ifdef _WIN32
+    // Windowsコンソールの出力コードページをUTF-8に設定
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+
     printf("[DEBUG] プログラムを起動します\n");
 
     // SDLの初期化
