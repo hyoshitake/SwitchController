@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
                     connected = false;
                 } else if (event.type == SDL_EVENT_GAMEPAD_REMOVED) {
                     printf("[DEBUG] Gamepad切断イベントを検出: Instance ID = %d\n", event.gdevice.which);
-                    if (gamepad && SDL_GetGamepadInstanceID(gamepad) == event.gdevice.which) {
+                    if (gamepad && SDL_GetGamepadID(gamepad) == event.gdevice.which) {
                         // 4. 切断時の処理
                         printf("Disconnected!!\n");
                         SDL_CloseGamepad(gamepad);

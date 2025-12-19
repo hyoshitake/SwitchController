@@ -1,0 +1,4 @@
+以下エラーがでます。解決してください。
+```
+implicit declaration of function 'SDL_GetGamepadInstanceID';
+```
