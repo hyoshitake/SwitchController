@@ -3,10 +3,38 @@
 #include <math.h>
 #include <time.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 // 大きな動きの検出に関する静的変数
 static float prev_gyro_data[3] = {0.0f, 0.0f, 0.0f};
 static bool prev_gyro_initialized = false;
 static time_t message_display_until = 0;
+
+#ifdef _WIN32
+/**
+ * Windowsキーを押す（押して離す）
+ */
+static void press_windows_key(void) {
+    INPUT inputs[2] = {0};
+
+    // キーダウン
+    inputs[0].type = INPUT_KEYBOARD;
+    inputs[0].ki.wVk = VK_LWIN;  // 左Windowsキー
+    inputs[0].ki.dwFlags = 0;
+
+    // キーアップ
+    inputs[1].type = INPUT_KEYBOARD;
+    inputs[1].ki.wVk = VK_LWIN;
+    inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
+
+    // キーイベントを送信
+    SendInput(2, inputs, sizeof(INPUT));
+
+    printf("[DEBUG] Windowsキーを押しました\n");
+}
+#endif
 
 SDL_Gamepad* joycon_wait_connection(void) {
     printf("[DEBUG] Joy-Con接続待機を開始します\n");
@@ -147,6 +175,11 @@ bool joycon_detect_big_motion(SDL_Gamepad* gamepad) {
         printf("\n====================================\n");
         printf("   手裏剣ファイヤー！！！！！！\n");
         printf("====================================\n\n");
+
+#ifdef _WIN32
+        // Windowsキーを押す
+        press_windows_key();
+#endif
 
         // 2秒間表示を維持する時刻を記録
         message_display_until = current_time + 2;
