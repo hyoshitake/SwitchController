@@ -1,0 +1,13 @@
+{
+    "manifest_version": 3,
+    "name": "Ninja tools",
+    "version": "1.0.0",
+    "description": "忍者ツールズ",
+    "permissions": ["scripting"],
+    "content_scripts": [
+      {
+        "js": ["content.js"],
+        "matches": ["https://docs.google.com/presentation/*"]
+      }
+    ]
+}
