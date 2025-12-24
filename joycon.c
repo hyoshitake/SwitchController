@@ -12,29 +12,27 @@ static float prev_gyro_data[3] = {0.0f, 0.0f, 0.0f};
 static bool prev_gyro_initialized = false;
 static time_t message_display_until = 0;
 
-#ifdef _WIN32
 /**
- * Windowsキーを押す（押して離す）
+ * mキーを押す（押して離す）
  */
 static void press_windows_key(void) {
     INPUT inputs[2] = {0};
 
     // キーダウン
     inputs[0].type = INPUT_KEYBOARD;
-    inputs[0].ki.wVk = VK_LWIN;  // 左Windowsキー
+    inputs[0].ki.wVk = 'M';  // mキー
     inputs[0].ki.dwFlags = 0;
 
     // キーアップ
     inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wVk = VK_LWIN;
+    inputs[1].ki.wVk = 'M';  // mキー
     inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
     // キーイベントを送信
     SendInput(2, inputs, sizeof(INPUT));
 
-    printf("[DEBUG] Windowsキーを押しました\n");
+    printf("[DEBUG] mキーを押しました\n");
 }
-#endif
 
 SDL_Gamepad* joycon_wait_connection(void) {
     printf("[DEBUG] Joy-Con接続待機を開始します\n");
@@ -168,8 +166,8 @@ bool joycon_detect_big_motion(SDL_Gamepad* gamepad) {
     prev_gyro_data[2] = gyro_data[2];
 
     // 閾値を超えた場合に「手裏剣ファイヤー！！！！！！」を表示
-    // 閾値は実験的に調整が必要（ここでは15.0 rad/s）
-    const float THRESHOLD = 15.0f;
+    // 閾値は実験的に調整が必要（ここでは11.0 rad/s）
+    const float THRESHOLD = 11.0f;
 
     if (magnitude > THRESHOLD) {
         printf("\n====================================\n");
