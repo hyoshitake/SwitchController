@@ -9,7 +9,7 @@
 
 /**
  * メイン関数
- * Joy-Conの接続を管理し、Gyroセンサーのデータを表示する
+ * Joy-Conの接続を管理し、Accelセンサーのデータを表示する
  */
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
@@ -28,19 +28,19 @@ int main(int argc, char* argv[]) {
 
     bool running = true;
     SDL_Gamepad* gamepad = NULL;
-    bool gyro_enabled = false;
+    bool accel_enabled = false;
 
     while (running) {
         // 1. Joy-Conの接続を待つ
         gamepad = joycon_wait_connection();
 
-        // 2. Gyroセンサーのチェック
-        bool has_gyro = joycon_check_gyro(gamepad);
+        // 2. Accelセンサーのチェック
+        bool has_accel = joycon_check_accel(gamepad);
 
-        gyro_enabled = false;
-        if (has_gyro) {
-            // 3. Gyroセンサーを有効化
-            gyro_enabled = joycon_enable_gyro(gamepad);
+        accel_enabled = false;
+        if (has_accel) {
+            // 3. Accelセンサーを有効化
+            accel_enabled = joycon_enable_accel(gamepad);
         }
 
         // メインループ
@@ -79,8 +79,8 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-            // 3. Gyroセンサーが有効な場合、大きな動きを検出
-            if (gyro_enabled) {
+            // 3. Accelセンサーが有効な場合、大きな動きを検出
+            if (accel_enabled) {
                 joycon_detect_big_motion(gamepad);
             }
 

@@ -1,0 +1,2 @@
+SDLのGyroセンサーからAcceleratorセンサーに変更してください。SDL_SENSOR_GYROからSDL_SENSOR_ACCELに変更し、関数名や変数名もGyroからAccelに変更して下さい。
+joycon_detect_big_motion関数も加速度センサーを使った大きな動きの取得に変更してください。

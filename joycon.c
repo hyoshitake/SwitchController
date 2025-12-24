@@ -8,14 +8,14 @@
 #endif
 
 // 大きな動きの検出に関する静的変数
-static float prev_gyro_data[3] = {0.0f, 0.0f, 0.0f};
-static bool prev_gyro_initialized = false;
+static float prev_accel_data[3] = {0.0f, 0.0f, 0.0f};
+static bool prev_accel_initialized = false;
 static time_t message_display_until = 0;
 
 /**
  * mキーを押す（押して離す）
  */
-static void press_windows_key(void) {
+static void press_m_key(void) {
     INPUT inputs[2] = {0};
 
     // キーダウン
@@ -63,56 +63,56 @@ SDL_Gamepad* joycon_wait_connection(void) {
     return gamepad;
 }
 
-bool joycon_check_gyro(SDL_Gamepad* gamepad) {
+bool joycon_check_accel(SDL_Gamepad* gamepad) {
     if (!gamepad) {
         printf("[DEBUG] gamepadがNULLです\n");
         return false;
     }
 
-    printf("[DEBUG] Gyroセンサーの有無をチェックします\n");
-    bool has_gyro = SDL_GamepadHasSensor(gamepad, SDL_SENSOR_GYRO);
+    printf("[DEBUG] Accelセンサーの有無をチェックします\n");
+    bool has_accel = SDL_GamepadHasSensor(gamepad, SDL_SENSOR_ACCEL);
 
-    if (has_gyro) {
-        printf("Gyro OK (^_^)\n");
+    if (has_accel) {
+        printf("Accel OK (^_^)\n");
     } else {
-        printf("Gyro NG (x_x)\n");
+        printf("Accel NG (x_x)\n");
     }
 
-    return has_gyro;
+    return has_accel;
 }
 
-bool joycon_enable_gyro(SDL_Gamepad* gamepad) {
+bool joycon_enable_accel(SDL_Gamepad* gamepad) {
     if (!gamepad) {
         printf("[DEBUG] gamepadがNULLです\n");
         return false;
     }
 
-    printf("[DEBUG] Gyroセンサーを有効化します\n");
-    if (SDL_SetGamepadSensorEnabled(gamepad, SDL_SENSOR_GYRO, true) < 0) {
-        printf("[DEBUG] Gyroセンサーの有効化に失敗: %s\n", SDL_GetError());
+    printf("[DEBUG] Accelセンサーを有効化します\n");
+    if (SDL_SetGamepadSensorEnabled(gamepad, SDL_SENSOR_ACCEL, true) < 0) {
+        printf("[DEBUG] Accelセンサーの有効化に失敗: %s\n", SDL_GetError());
         return false;
     }
 
-    printf("[DEBUG] Gyroセンサーの有効化に成功しました\n");
+    printf("[DEBUG] Accelセンサーの有効化に成功しました\n");
     return true;
 }
 
-bool joycon_read_and_display_gyro(SDL_Gamepad* gamepad) {
+bool joycon_read_and_display_accel(SDL_Gamepad* gamepad) {
     if (!gamepad) {
         return false;
     }
 
-    float gyro_data[3];
+    float accel_data[3];
 
-    // Gyroセンサーのデータを取得
-    if (SDL_GetGamepadSensorData(gamepad, SDL_SENSOR_GYRO, gyro_data, 3) < 0) {
-        printf("[DEBUG] Gyroデータの取得に失敗: %s\n", SDL_GetError());
+    // Accelセンサーのデータを取得
+    if (SDL_GetGamepadSensorData(gamepad, SDL_SENSOR_ACCEL, accel_data, 3) < 0) {
+        printf("[DEBUG] Accelデータの取得に失敗: %s\n", SDL_GetError());
         return false;
     }
 
-    // Gyroデータを表示（X, Y, Z軸の角速度）
-    printf("Gyro Data - X: %8.3f, Y: %8.3f, Z: %8.3f (rad/s)\n",
-           gyro_data[0], gyro_data[1], gyro_data[2]);
+    // Accelデータを表示（X, Y, Z軸の加速度）
+    printf("Accel Data - X: %8.3f, Y: %8.3f, Z: %8.3f (m/s^2)\n",
+           accel_data[0], accel_data[1], accel_data[2]);
 
     return true;
 }
@@ -138,55 +138,53 @@ bool joycon_detect_big_motion(SDL_Gamepad* gamepad) {
         return true;
     }
 
-    float gyro_data[3];
+    float accel_data[3];
 
-    // Gyroセンサーのデータを取得
-    if (SDL_GetGamepadSensorData(gamepad, SDL_SENSOR_GYRO, gyro_data, 3) < 0) {
+    // Accelセンサーのデータを取得
+    if (SDL_GetGamepadSensorData(gamepad, SDL_SENSOR_ACCEL, accel_data, 3) < 0) {
         return false;
     }
 
     // 前回の値が初期化されていない場合は初期化する
-    if (!prev_gyro_initialized) {
-        prev_gyro_data[0] = gyro_data[0];
-        prev_gyro_data[1] = gyro_data[1];
-        prev_gyro_data[2] = gyro_data[2];
-        prev_gyro_initialized = true;
+    if (!prev_accel_initialized) {
+        prev_accel_data[0] = accel_data[0];
+        prev_accel_data[1] = accel_data[1];
+        prev_accel_data[2] = accel_data[2];
+        prev_accel_initialized = true;
         return true;
     }
 
     // 変化量を計算（各軸の変化量の二乗和の平方根）
-    float delta_x = gyro_data[0] - prev_gyro_data[0];
-    float delta_y = gyro_data[1] - prev_gyro_data[1];
-    float delta_z = gyro_data[2] - prev_gyro_data[2];
+    float delta_x = accel_data[0] - prev_accel_data[0];
+    float delta_y = accel_data[1] - prev_accel_data[1];
+    float delta_z = accel_data[2] - prev_accel_data[2];
     float magnitude = sqrtf(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
 
     // 前回の値を更新
-    prev_gyro_data[0] = gyro_data[0];
-    prev_gyro_data[1] = gyro_data[1];
-    prev_gyro_data[2] = gyro_data[2];
+    prev_accel_data[0] = accel_data[0];
+    prev_accel_data[1] = accel_data[1];
+    prev_accel_data[2] = accel_data[2];
 
     // 閾値を超えた場合に「手裏剣ファイヤー！！！！！！」を表示
-    // 閾値は実験的に調整が必要（ここでは11.0 rad/s）
-    const float THRESHOLD = 11.0f;
+    // 閾値は実験的に調整が必要（ここでは18.0 m/s^2）
+    const float THRESHOLD = 18.0f;
 
     if (magnitude > THRESHOLD) {
         printf("\n====================================\n");
         printf("   手裏剣ファイヤー！！！！！！\n");
         printf("====================================\n\n");
 
-#ifdef _WIN32
-        // Windowsキーを押す
-        press_windows_key();
-#endif
+        // Mキーを押す
+        press_m_key();
 
         // 2秒間表示を維持する時刻を記録
         message_display_until = current_time + 2;
         return true;
     }
 
-    // Gyroデータを表示（X, Y, Z軸の角速度）
-    printf("Gyro Data - X: %8.3f, Y: %8.3f, Z: %8.3f (rad/s) [変化量: %8.3f]\n",
-           gyro_data[0], gyro_data[1], gyro_data[2], magnitude);
+    // Accelデータを表示（X, Y, Z軸の加速度）
+    printf("Accel Data - X: %8.3f, Y: %8.3f, Z: %8.3f (m/s^2) [変化量: %8.3f]\n",
+           accel_data[0], accel_data[1], accel_data[2], magnitude);
 
     return true;
 }
