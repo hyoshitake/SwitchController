@@ -132,17 +132,21 @@ bool joycon_detect_big_motion(SDL_Gamepad* gamepad) {
 
     time_t current_time = time(NULL);
 
-    // メッセージ表示期間中は変化量の測定も停止
-    if (current_time < message_display_until) {
-        // 待機中は何もしない
-        return true;
-    }
-
     float accel_data[3];
 
     // Accelセンサーのデータを取得
     if (SDL_GetGamepadSensorData(gamepad, SDL_SENSOR_ACCEL, accel_data, 3) < 0) {
         return false;
+    }
+
+    // メッセージ表示期間中は変化量の測定も停止
+    if (current_time < message_display_until) {
+        // 待機中もセンサーデータを読み取り、前回値を更新して
+        // 待機終了後に誤った大きな変化量が計算されるのを防ぐ
+        prev_accel_data[0] = accel_data[0];
+        prev_accel_data[1] = accel_data[1];
+        prev_accel_data[2] = accel_data[2];
+        return true;
     }
 
     // 前回の値が初期化されていない場合は初期化する
